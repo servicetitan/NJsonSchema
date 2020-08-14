@@ -249,7 +249,7 @@ namespace NJsonSchema
             }
         }
 
-        /// <summary>Gets the inherited/parent schema which may also be inlined 
+        /// <summary>Gets the inherited/parent schema which may also be inlined
         /// (the schema itself if it is a dictionary or array, otherwise <see cref="InheritedSchema"/>).</summary>
         /// <remarks>Used for code generation.</remarks>
         [JsonIgnore]
@@ -800,6 +800,18 @@ namespace NJsonSchema
             if (ActualTypeSchema != this && ActualTypeSchema.IsNullable(schemaType))
             {
                 return true;
+            }
+            // Fix for https://github.com/RicoSuter/NSwag/issues/2887
+            if (IsNullableRaw == null)
+            {
+                if (Type == JsonObjectType.String || Type == JsonObjectType.Object)
+                {
+                    return true;
+                }
+                if (Type == JsonObjectType.Number || Type == JsonObjectType.Integer)
+                {
+                    return false;
+                }
             }
 
             return false;
