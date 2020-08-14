@@ -802,7 +802,7 @@ namespace NJsonSchema
                 return true;
             }
             // Fix for https://github.com/RicoSuter/NSwag/issues/2887
-            if (IsNullableRaw == null)
+            if (IsNullableRaw == null && !IsArray)
             {
                 if (Type == JsonObjectType.String || Type == JsonObjectType.Object)
                 {
