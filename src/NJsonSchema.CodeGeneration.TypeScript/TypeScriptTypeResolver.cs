@@ -165,7 +165,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                         {
                             return $"{{ [key in {keyType}]?: {valueType}; }}";
                         }
-
+                        
                         throw new ArgumentOutOfRangeException(nameof(Settings.EnumStyle), Settings.EnumStyle, "Unknown enum style");
                     }
 
@@ -268,10 +268,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 else
                 {
                     var itemType = prefix + Resolve(schema.Item, true, typeNameHint);
-
-                    // disable `stringArray: (string | undefined)[];` generation
-                    //return string.Format("{0}[]", GetNullableItemType(schema, itemType)); // TODO: Make typeNameHint singular if possible
-                    return itemType + "[]";
+                    return string.Format("{0}[]", GetNullableItemType(schema, itemType)); // TODO: Make typeNameHint singular if possible
                 }
             }
 
