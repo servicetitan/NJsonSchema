@@ -184,7 +184,7 @@ namespace NJsonSchema.Generation
             ApplySchemaProcessors(schema, contextualType, schemaResolver);
         }
 
-        /// <summary>Generetes a schema directly or referenced for the requested schema type; 
+        /// <summary>Generetes a schema directly or referenced for the requested schema type;
         /// does NOT change nullability.</summary>
         /// <typeparam name="TSchemaType">The resulted schema type which may reference the actual schema.</typeparam>
         /// <param name="contextualType">The type of the schema to generate.</param>
@@ -200,7 +200,7 @@ namespace NJsonSchema.Generation
             return GenerateWithReferenceAndNullability(contextualType, false, schemaResolver, transformation);
         }
 
-        /// <summary>Generetes a schema directly or referenced for the requested schema type; 
+        /// <summary>Generetes a schema directly or referenced for the requested schema type;
         /// also adds nullability if required by looking at the type's <see cref="JsonTypeDescription" />.</summary>
         /// <typeparam name="TSchemaType">The resulted schema type which may reference the actual schema.</typeparam>
         /// <param name="contextualType">The type of the schema to generate.</param>
@@ -1043,7 +1043,7 @@ namespace NJsonSchema.Generation
 
                         if (actualSchema.Properties.Any() || requiresSchemaReference)
                         {
-                            // Use allOf inheritance only if the schema is an object with properties 
+                            // Use allOf inheritance only if the schema is an object with properties
                             // (not empty class which just inherits from array or dictionary)
 
                             var baseSchema = Generate(baseType, schemaResolver);
@@ -1110,7 +1110,7 @@ namespace NJsonSchema.Generation
                 {
                     var discriminatorName = TryGetInheritanceDiscriminatorName(discriminatorConverter);
 
-                    // Existing property can be discriminator only if it has String type  
+                    // Existing property can be discriminator only if it has String type
                     if (typeSchema.Properties.TryGetValue(discriminatorName, out JsonSchemaProperty existingProperty) &&
                         (existingProperty.Type & JsonObjectType.String) == 0)
                     {
@@ -1202,63 +1202,77 @@ namespace NJsonSchema.Generation
                     hasRequiredAttribute == false &&
                     (jsonProperty.Required == Required.Default || jsonProperty.Required == Required.AllowNull);
 
-                Action<JsonSchemaProperty, JsonSchema> TransformSchema = (propertySchema, typeSchema) =>
-                {
-                    if (Settings.GenerateXmlObjects)
-                    {
-                        propertySchema.GenerateXmlObjectForProperty(memberInfo, propertyName);
-                    }
-
-                    if (hasRequiredAttribute &&
-                        propertyTypeDescription.IsEnum == false &&
-                        propertyTypeDescription.Type == JsonObjectType.String &&
-                        requiredAttribute.TryGetPropertyValue("AllowEmptyStrings", false) == false)
-                    {
-                        propertySchema.MinLength = 1;
-                    }
-
-                    if (!isNullable && Settings.SchemaType == SchemaType.Swagger2)
-                    {
-                        if (!parentSchema.RequiredProperties.Contains(propertyName))
-                        {
-                            parentSchema.RequiredProperties.Add(propertyName);
-                        }
-                    }
-
-                    dynamic readOnlyAttribute = memberInfo.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.ReadOnlyAttribute");
-                    if (readOnlyAttribute != null)
-                    {
-                        propertySchema.IsReadOnly = readOnlyAttribute.IsReadOnly;
-                    }
-
-                    if (propertySchema.Description == null)
-                    {
-                        propertySchema.Description = memberInfo.GetDescription();
-                    }
-
-                    if (propertySchema.Example == null)
-                    {
-                        propertySchema.Example = GenerateExample(memberInfo);
-                    }
-
-                    dynamic obsoleteAttribute = memberInfo.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ObsoleteAttribute");
-                    if (obsoleteAttribute != null)
-                    {
-                        propertySchema.IsDeprecated = true;
-                        propertySchema.DeprecatedMessage = obsoleteAttribute.Message;
-                    }
-
-                    propertySchema.Default = ConvertDefaultValue(memberInfo, jsonProperty.DefaultValue);
-
-                    ApplyDataAnnotations(propertySchema, propertyTypeDescription);
-                    ApplyPropertyExtensionDataAttributes(memberInfo, propertySchema);
-                };
-
                 var referencingProperty = GenerateWithReferenceAndNullability(
-                    memberInfo, isNullable, schemaResolver, TransformSchema);
+                    memberInfo,
+                    isNullable,
+                    schemaResolver,
+                    (JsonSchemaProperty propertySchema, JsonSchema typeSchema) => TransformSchema(propertySchema, typeSchema, memberInfo, propertyName, hasRequiredAttribute, propertyTypeDescription, requiredAttribute, isNullable, parentSchema, jsonProperty));
 
                 parentSchema.Properties.Add(propertyName, referencingProperty);
             }
+        }
+
+        protected virtual void TransformSchema(
+            JsonSchemaProperty propertySchema,
+            JsonSchema typeSchema,
+            ContextualMemberInfo memberInfo,
+            string propertyName,
+            bool hasRequiredAttribute,
+            JsonTypeDescription propertyTypeDescription,
+            Attribute requiredAttribute,
+            bool isNullable,
+            JsonSchema parentSchema,
+            JsonProperty jsonProperty
+            )
+        {
+            if (Settings.GenerateXmlObjects)
+            {
+                propertySchema.GenerateXmlObjectForProperty(memberInfo, propertyName);
+            }
+
+            if (hasRequiredAttribute &&
+                propertyTypeDescription.IsEnum == false &&
+                propertyTypeDescription.Type == JsonObjectType.String &&
+                requiredAttribute.TryGetPropertyValue("AllowEmptyStrings", false) == false)
+            {
+                propertySchema.MinLength = 1;
+            }
+
+            if (!isNullable && Settings.SchemaType == SchemaType.Swagger2)
+            {
+                if (!parentSchema.RequiredProperties.Contains(propertyName))
+                {
+                    parentSchema.RequiredProperties.Add(propertyName);
+                }
+            }
+
+            dynamic readOnlyAttribute = memberInfo.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.ReadOnlyAttribute");
+            if (readOnlyAttribute != null)
+            {
+                propertySchema.IsReadOnly = readOnlyAttribute.IsReadOnly;
+            }
+
+            if (propertySchema.Description == null)
+            {
+                propertySchema.Description = memberInfo.GetDescription();
+            }
+
+            if (propertySchema.Example == null)
+            {
+                propertySchema.Example = GenerateExample(memberInfo);
+            }
+
+            dynamic obsoleteAttribute = memberInfo.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ObsoleteAttribute");
+            if (obsoleteAttribute != null)
+            {
+                propertySchema.IsDeprecated = true;
+                propertySchema.DeprecatedMessage = obsoleteAttribute.Message;
+            }
+
+            propertySchema.Default = ConvertDefaultValue(memberInfo, jsonProperty.DefaultValue);
+
+            ApplyDataAnnotations(propertySchema, propertyTypeDescription);
+            ApplyPropertyExtensionDataAttributes(memberInfo, propertySchema);
         }
 
         /// <summary>Checks whether a property is ignored.</summary>
@@ -1369,7 +1383,7 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private void ApplyPropertyExtensionDataAttributes(ContextualMemberInfo memberInfo, JsonSchemaProperty propertySchema)
+        protected void ApplyPropertyExtensionDataAttributes(ContextualMemberInfo memberInfo, JsonSchemaProperty propertySchema)
         {
             var extensionDataAttributes = memberInfo.GetContextAttributes<JsonSchemaExtensionDataAttribute>().ToArray();
             if (extensionDataAttributes.Any())

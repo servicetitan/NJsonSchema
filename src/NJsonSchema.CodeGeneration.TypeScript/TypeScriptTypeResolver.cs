@@ -165,7 +165,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                         {
                             return $"{{ [key in {keyType}]?: {valueType}; }}";
                         }
-                        
+
                         throw new ArgumentOutOfRangeException(nameof(Settings.EnumStyle), Settings.EnumStyle, "Unknown enum style");
                     }
 
@@ -284,7 +284,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             return "any[]";
         }
 
-        private string GetNullableItemType(JsonSchema schema, string itemType)
+        protected virtual string GetNullableItemType(JsonSchema schema, string itemType)
         {
             if (Settings.SupportsStrictNullChecks && schema.Item.IsNullable(Settings.SchemaType))
             {
