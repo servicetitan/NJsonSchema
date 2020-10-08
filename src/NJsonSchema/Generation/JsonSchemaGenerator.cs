@@ -752,7 +752,8 @@ namespace NJsonSchema.Generation
             where TSchemaType : JsonSchema, new()
         {
             var extensionDataProperty = type.GetContextualProperties()
-                .FirstOrDefault(p => p.GetContextAttribute<JsonExtensionDataAttribute>() != null);
+                .FirstOrDefault(p => p.ContextAttributes.Any(a => 
+                    Namotion.Reflection.TypeExtensions.IsAssignableToTypeName(a.GetType(), "JsonExtensionDataAttribute", TypeNameStyle.Name)));
 
             if (extensionDataProperty != null)
             {
@@ -1113,7 +1114,7 @@ namespace NJsonSchema.Generation
                     // Existing property can be discriminator only if it has String type  
                     if (typeSchema.Properties.TryGetValue(discriminatorName, out var existingProperty))
                     {
-                        if (!existingProperty.ActualTypeSchema.Type.HasFlag(JsonObjectType.Integer) && 
+                        if (!existingProperty.ActualTypeSchema.Type.HasFlag(JsonObjectType.Integer) &&
                             !existingProperty.ActualTypeSchema.Type.HasFlag(JsonObjectType.String))
                         {
                             throw new InvalidOperationException("The JSON discriminator property '" + discriminatorName + "' must be a string|int property on type '" + type.FullName + "' (it is recommended to not implement the discriminator property at all).");
@@ -1385,16 +1386,33 @@ namespace NJsonSchema.Generation
 
         private void ApplyTypeExtensionDataAttributes<TSchemaType>(TSchemaType schema, ContextualType contextualType) where TSchemaType : JsonSchema, new()
         {
-            var extensionDataAttributes = contextualType.OriginalType.GetTypeInfo().GetCustomAttributes<JsonSchemaExtensionDataAttribute>().ToArray();
-            if (extensionDataAttributes.Any())
+            Attribute[] extensionAttributes;
+
+#if NETSTANDARD1_0
+            extensionAttributes = contextualType.OriginalType.GetTypeInfo().GetCustomAttributes().Where(attribute =>
+                attribute.GetType().GetTypeInfo().ImplementedInterfaces.Contains(typeof(IJsonSchemaExtensionDataAttribute))).ToArray();
+#else
+            extensionAttributes = contextualType.OriginalType.GetTypeInfo().GetCustomAttributes().Where(attribute => 
+                typeof(IJsonSchemaExtensionDataAttribute).IsAssignableFrom(attribute.GetType())).ToArray();
+#endif
+
+            if (extensionAttributes.Any())
             {
-                schema.ExtensionData = extensionDataAttributes.ToDictionary(a => a.Key, a => a.Value);
+                var extensionData = new Dictionary<string, object>();
+
+                foreach (var attribute in extensionAttributes)
+                {
+                    var extensionAttribute = (IJsonSchemaExtensionDataAttribute)attribute;
+                    extensionData.Add(extensionAttribute.Key, extensionAttribute.Value);
+                }
+
+                schema.ExtensionData = extensionData;
             }
         }
 
         protected void ApplyPropertyExtensionDataAttributes(ContextualMemberInfo memberInfo, JsonSchemaProperty propertySchema)
         {
-            var extensionDataAttributes = memberInfo.GetContextAttributes<JsonSchemaExtensionDataAttribute>().ToArray();
+            var extensionDataAttributes = memberInfo.GetContextAttributes<IJsonSchemaExtensionDataAttribute>().ToArray();
             if (extensionDataAttributes.Any())
             {
                 propertySchema.ExtensionData = extensionDataAttributes.ToDictionary(a => a.Key, a => a.Value);
