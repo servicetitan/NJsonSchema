@@ -1,16 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>JSON Schema reader, generator and validator for .NET</Description>
-    <Version>10.3.1</Version>
+    <Version>10.3.4</Version>
     <PackageTags>json schema validation generator .net</PackageTags>
     <Copyright>Copyright © Rico Suter, 2020</Copyright>
-    <PackageLicenseUrl>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</PackageLicenseUrl>
     <PackageProjectUrl>http://NJsonSchema.org</PackageProjectUrl>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>../NJsonSchema.snk</AssemblyOriginatorKeyFile>
     <PackageIconUrl />
     <Authors>Rico Suter</Authors>
-    <PackageIconUrl>https://raw.githubusercontent.com/RSuter/NJsonSchema/master/assets/NuGetIcon.png</PackageIconUrl>
+    <PackageIcon>NuGetIcon.png</PackageIcon>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Company />
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
@@ -36,5 +36,8 @@
   <ItemGroup>
     <ProjectReference Include="..\NJsonSchema.CodeGeneration\NJsonSchema.CodeGeneration.csproj" />
     <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="NuGetIcon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 </Project>
