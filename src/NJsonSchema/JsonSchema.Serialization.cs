@@ -259,6 +259,11 @@ namespace NJsonSchema
                 }
                 else if (value != null)
                 {
+                    if (value is JObject jValue && !jValue.HasValues)
+                    {
+                        AllowAdditionalProperties = true;
+                        return;
+                    }
                     AdditionalPropertiesSchema = FromJsonWithCurrentSettings(value);
                 }
             }
