@@ -259,7 +259,8 @@ namespace NJsonSchema
                 }
                 else if (value != null)
                 {
-                    if (value is JObject jValue && !jValue.HasValues)
+                    if (JsonSchemaSerialization.CurrentSchemaType == SchemaType.Swagger2
+                        && value is JObject jValue && !jValue.HasValues)
                     {
                         AllowAdditionalProperties = true;
                         return;
