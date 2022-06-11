@@ -338,7 +338,10 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             return "any[]";
         }
 
-        private string GetNullableItemType(JsonSchema schema, string itemType)
+        /// <summary>
+        /// PATCH: Overriden for backward compatibility with the old generator
+        /// </summary>
+        protected virtual string GetNullableItemType(JsonSchema schema, string itemType)
         {
             if (Settings.SupportsStrictNullChecks && schema.Item.IsNullable(Settings.SchemaType))
             {

@@ -263,6 +263,13 @@ namespace NJsonSchema
                 }
                 else if (value != null)
                 {
+                    // PATCH: Some customization, not sure exactly what the initial use-case was
+                    if (JsonSchemaSerialization.CurrentSchemaType == SchemaType.Swagger2
+                        && value is JObject jValue && !jValue.HasValues)
+                    {
+                        AllowAdditionalProperties = true;
+                        return;
+                    }
                     AdditionalPropertiesSchema = FromJsonWithCurrentSettings(value);
                 }
             }

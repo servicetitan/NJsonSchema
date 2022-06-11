@@ -1248,63 +1248,92 @@ namespace NJsonSchema.Generation
                     hasRequiredAttribute == false &&
                     (jsonProperty.Required == Required.Default || jsonProperty.Required == Required.AllowNull);
 
-                Action<JsonSchemaProperty, JsonSchema> TransformSchema = (propertySchema, typeSchema) =>
-                {
-                    if (Settings.GenerateXmlObjects)
-                    {
-                        propertySchema.GenerateXmlObjectForProperty(accessorInfo.AccessorType, propertyName);
-                    }
-
-                    if (hasRequiredAttribute &&
-                        propertyTypeDescription.IsEnum == false &&
-                        propertyTypeDescription.Type == JsonObjectType.String &&
-                        requiredAttribute.TryGetPropertyValue("AllowEmptyStrings", false) == false)
-                    {
-                        propertySchema.MinLength = 1;
-                    }
-
-                    if (!isNullable && Settings.SchemaType == SchemaType.Swagger2)
-                    {
-                        if (!parentSchema.RequiredProperties.Contains(propertyName))
-                        {
-                            parentSchema.RequiredProperties.Add(propertyName);
-                        }
-                    }
-
-                    dynamic readOnlyAttribute = accessorInfo.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.ReadOnlyAttribute");
-                    if (readOnlyAttribute != null)
-                    {
-                        propertySchema.IsReadOnly = readOnlyAttribute.IsReadOnly;
-                    }
-
-                    if (propertySchema.Description == null)
-                    {
-                        propertySchema.Description = accessorInfo.GetDescription(Settings);
-                    }
-
-                    if (propertySchema.Example == null)
-                    {
-                        propertySchema.Example = GenerateExample(accessorInfo);
-                    }
-
-                    dynamic obsoleteAttribute = accessorInfo.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ObsoleteAttribute");
-                    if (obsoleteAttribute != null)
-                    {
-                        propertySchema.IsDeprecated = true;
-                        propertySchema.DeprecatedMessage = obsoleteAttribute.Message;
-                    }
-
-                    propertySchema.Default = ConvertDefaultValue(accessorInfo.AccessorType, jsonProperty.DefaultValue);
-
-                    ApplyDataAnnotations(propertySchema, propertyTypeDescription);
-                    ApplyPropertyExtensionDataAttributes(accessorInfo, propertySchema);
-                };
+                // PATCH: Extracted a method, so we could override it
 
                 var referencingProperty = GenerateWithReferenceAndNullability(
-                    accessorInfo.AccessorType, isNullable, schemaResolver, TransformSchema);
+                    accessorInfo.AccessorType,
+                    isNullable,
+                    schemaResolver,
+                    (JsonSchemaProperty propertySchema, JsonSchema typeSchema) =>
+                        TransformSchema(
+                            propertySchema,
+                            typeSchema,
+                            accessorInfo,
+                            propertyName,
+                            hasRequiredAttribute,
+                            propertyTypeDescription,
+                            requiredAttribute,
+                            isNullable,
+                            parentSchema,
+                            jsonProperty));
 
                 parentSchema.Properties.Add(propertyName, referencingProperty);
             }
+        }
+
+        /// <summary>
+        /// PATCH: Extracted a method, so we could override it
+        /// </summary>
+        protected virtual void TransformSchema(
+            JsonSchemaProperty propertySchema,
+            JsonSchema typeSchema,
+            ContextualAccessorInfo accessorInfo,
+            string propertyName,
+            bool hasRequiredAttribute,
+            JsonTypeDescription propertyTypeDescription,
+            Attribute requiredAttribute,
+            bool isNullable,
+            JsonSchema parentSchema,
+            JsonProperty jsonProperty)
+        {
+            if (Settings.GenerateXmlObjects)
+            {
+                propertySchema.GenerateXmlObjectForProperty(accessorInfo.AccessorType, propertyName);
+            }
+
+            if (hasRequiredAttribute &&
+                propertyTypeDescription.IsEnum == false &&
+                propertyTypeDescription.Type == JsonObjectType.String &&
+                requiredAttribute.TryGetPropertyValue("AllowEmptyStrings", false) == false)
+            {
+                propertySchema.MinLength = 1;
+            }
+
+            if (!isNullable && Settings.SchemaType == SchemaType.Swagger2)
+            {
+                if (!parentSchema.RequiredProperties.Contains(propertyName))
+                {
+                    parentSchema.RequiredProperties.Add(propertyName);
+                }
+            }
+
+            dynamic readOnlyAttribute = accessorInfo.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ComponentModel.ReadOnlyAttribute");
+            if (readOnlyAttribute != null)
+            {
+                propertySchema.IsReadOnly = readOnlyAttribute.IsReadOnly;
+            }
+
+            if (propertySchema.Description == null)
+            {
+                propertySchema.Description = accessorInfo.GetDescription(Settings);
+            }
+
+            if (propertySchema.Example == null)
+            {
+                propertySchema.Example = GenerateExample(accessorInfo);
+            }
+
+            dynamic obsoleteAttribute = accessorInfo.ContextAttributes.FirstAssignableToTypeNameOrDefault("System.ObsoleteAttribute");
+            if (obsoleteAttribute != null)
+            {
+                propertySchema.IsDeprecated = true;
+                propertySchema.DeprecatedMessage = obsoleteAttribute.Message;
+            }
+
+            propertySchema.Default = ConvertDefaultValue(accessorInfo.AccessorType, jsonProperty.DefaultValue);
+
+            ApplyDataAnnotations(propertySchema, propertyTypeDescription);
+            ApplyPropertyExtensionDataAttributes(accessorInfo, propertySchema);
         }
 
         /// <summary>Checks whether a property is ignored.</summary>
@@ -1425,7 +1454,10 @@ namespace NJsonSchema.Generation
             }
         }
 
-        private void ApplyPropertyExtensionDataAttributes(ContextualAccessorInfo accessorInfo, JsonSchemaProperty propertySchema)
+        /// <summary>
+        /// PATCH: Used from overriden method
+        /// </summary>
+        protected void ApplyPropertyExtensionDataAttributes(ContextualAccessorInfo accessorInfo, JsonSchemaProperty propertySchema)
         {
             var extensionDataAttributes = accessorInfo
                 .GetContextAttributes<IJsonSchemaExtensionDataAttribute>()
