@@ -78,9 +78,10 @@ namespace NJsonSchema.CodeGeneration.CSharp
             var markAsNullableType = Settings.GenerateNullableReferenceTypes && isNullable;
 
             if (schema.ActualTypeSchema.IsAnyType &&
+                schema.ActualDiscriminator == null &&
                 schema.InheritedSchema == null && // not in inheritance hierarchy
                 schema.AllOf.Count == 0 &&
-                !Types.Keys.Contains(schema) &&
+                !Types.ContainsKey(schema) &&
                 !schema.HasReference)
             {
                 return markAsNullableType ? Settings.AnyType + "?" : Settings.AnyType;
@@ -94,17 +95,17 @@ namespace NJsonSchema.CodeGeneration.CSharp
                     JsonObjectType.String;
             }
 
-            if (type.HasFlag(JsonObjectType.Number))
+            if (type.IsNumber())
             {
                 return ResolveNumber(schema.ActualTypeSchema, isNullable);
             }
 
-            if (type.HasFlag(JsonObjectType.Integer) && !schema.ActualTypeSchema.IsEnumeration)
+            if (type.IsInteger() && !schema.ActualTypeSchema.IsEnumeration)
             {
                 return ResolveInteger(schema.ActualTypeSchema, isNullable, typeNameHint);
             }
 
-            if (type.HasFlag(JsonObjectType.Boolean))
+            if (type.IsBoolean())
             {
                 return ResolveBoolean(isNullable);
             }
@@ -117,14 +118,14 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 return "byte[]" + nullableReferenceType;
             }
 
-            if (type.HasFlag(JsonObjectType.String) && !schema.ActualTypeSchema.IsEnumeration)
+            if (type.IsString() && !schema.ActualTypeSchema.IsEnumeration)
             {
                 return ResolveString(schema.ActualTypeSchema, isNullable, typeNameHint);
             }
 
             // Type generating schemas
 
-            if (schema.Type.HasFlag(JsonObjectType.Array))
+            if (schema.Type.IsArray())
             {
                 return ResolveArrayOrTuple(schema) + nullableReferenceType;
             }
@@ -174,7 +175,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
                 return isNullable && Settings.TimeType?.ToLowerInvariant() != "string" ? Settings.TimeType + "?" : Settings.TimeType;
             }
 
-            if (schema.Format == JsonFormatStrings.TimeSpan)
+            if (schema.Format is JsonFormatStrings.Duration or JsonFormatStrings.TimeSpan)
             {
                 return isNullable && Settings.TimeSpanType?.ToLowerInvariant() != "string" ? Settings.TimeSpanType + "?" : Settings.TimeSpanType;
             }

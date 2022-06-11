@@ -34,7 +34,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             //// Assert
             Assert.DoesNotContain("extends { [key: string]: any; }", code);
-            Assert.Contains("[key: string]: any; ", code);
+            Assert.Contains("[key: string]: any;", code);
         }
 
         [Fact]
@@ -55,7 +55,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             //// Assert
             Assert.DoesNotContain("extends { [key: string]: any; }", code);
             Assert.DoesNotContain("super()", code);
-            Assert.Contains("[key: string]: any; ", code);
+            Assert.Contains("[key: string]: any;", code);
         }
 
         [Fact]
@@ -75,7 +75,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
 
             //// Assert
             Assert.DoesNotContain("extends { [key: string]: string; }", code);
-            Assert.Contains("[key: string]: string | any; ", code);
+            Assert.Contains("[key: string]: string | any;", code);
         }
 
         [Fact]
@@ -96,7 +96,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             //// Assert
             Assert.DoesNotContain("extends { [key: string]: string; }", code);
             Assert.DoesNotContain("super()", code);
-            Assert.Contains("[key: string]: string | any; ", code);
+            Assert.Contains("[key: string]: string | any;", code);
         }
 
         [Fact]
@@ -134,7 +134,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = codeGenerator.GenerateFile("Test");
 
             //// Assert
-            Assert.Contains("this.resource[key] = _data[\"resource\"][key] ? MyItem.fromJS(_data[\"resource\"][key]) : new MyItem();", code);
+            Assert.Contains("(<any>this.resource)[key] = _data[\"resource\"][key] ? MyItem.fromJS(_data[\"resource\"][key]) : new MyItem();", code);
         }
 
         [Fact]
@@ -195,7 +195,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Tests
             var code = codeGenerator.GenerateFile("Test");
 
             //// Assert
-            Assert.Contains("this.resource[key] = _data[\"resource\"][key];", code);
+            Assert.Contains("(<any>this.resource)[key] = _data[\"resource\"][key];", code);
         }
 
         public class DictionaryContainer

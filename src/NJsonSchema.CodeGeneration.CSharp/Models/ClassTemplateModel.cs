@@ -50,6 +50,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
             }
         }
 
+        /// <summary>Gets a value indicating whether to use System.Text.Json</summary>
+        public bool UseSystemTextJson => _settings.JsonLibrary == CSharpJsonLibrary.SystemTextJson;
+
         /// <summary>Gets or sets the class name.</summary>
         public override string ClassName { get; }
 
@@ -59,14 +62,15 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
         /// <summary>Gets a value indicating whether the C#8 nullable reference types are enabled for this file.</summary>
         public bool GenerateNullableReferenceTypes => _settings.GenerateNullableReferenceTypes;
 
-        /// <summary>Gets a value indicating whether an additional properties type is available.</summary>
+        /// <summary>Gets a value indicating whether an additional properties type is available and needed.</summary>
         public bool HasAdditionalPropertiesType =>
             !_schema.IsDictionary &&
             !_schema.ActualTypeSchema.IsDictionary &&
             !_schema.IsArray &&
             !_schema.ActualTypeSchema.IsArray &&
             (_schema.ActualTypeSchema.AllowAdditionalProperties ||
-             _schema.ActualTypeSchema.AdditionalPropertiesSchema != null);
+             _schema.ActualTypeSchema.AdditionalPropertiesSchema != null)
+            && BaseClass?.HasAdditionalPropertiesType != true; // if base class already has extension data array, we need to avoid it in the subclass
 
         /// <summary>Gets the type of the additional properties.</summary>
         public string AdditionalPropertiesType => HasAdditionalPropertiesType ? "object" : null; // TODO: Find a way to use typed dictionaries
@@ -98,6 +102,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         /// <summary>Gets a value indicating whether the class style is Record.</summary>
         public bool RenderRecord => _settings.ClassStyle == CSharpClassStyle.Record;
+
+        /// <summary>Gets a value indicating whether to generate records as C# 9.0 records.</summary>
+        public bool GenerateNativeRecords => _settings.GenerateNativeRecords;
 
         /// <summary>Gets a value indicating whether to render ToJson() and FromJson() methods.</summary>
         public bool GenerateJsonMethods => _settings.GenerateJsonMethods;
@@ -142,6 +149,9 @@ namespace NJsonSchema.CodeGeneration.CSharp.Models
 
         /// <summary>Gets the JSON serializer parameter code.</summary>
         public string JsonSerializerParameterCode => CSharpJsonSerializerGenerator.GenerateJsonSerializerParameterCode(_settings, null);
+
+        /// <summary>Gets the JSON converters array code.</summary>
+        public string JsonConvertersArrayCode => CSharpJsonSerializerGenerator.GenerateJsonConvertersArrayCode(_settings, null);
 
         /// <summary>Gets a value indicating whether the class is deprecated.</summary>
         public bool IsDeprecated => _schema.IsDeprecated;

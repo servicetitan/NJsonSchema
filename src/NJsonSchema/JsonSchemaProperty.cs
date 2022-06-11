@@ -91,28 +91,12 @@ namespace NJsonSchema
         /// <returns>true if the type can be null.</returns>
         public override bool IsNullable(SchemaType schemaType)
         {
-            // Fix for https://github.com/RicoSuter/NSwag/issues/2887
-
-            if (Type == JsonObjectType.Number
-                || Type == JsonObjectType.Integer
-                || (Type == JsonObjectType.String && Format == "date-time"))
-            {
-                return false;
-            }
-
-            if (IsNullableRaw == null && (Type == JsonObjectType.Object || Type == JsonObjectType.String || Type == JsonObjectType.Array))
-            {
-                return !IsRequired;
-            }
-
-            if (IsNullableRaw == true)
+            if (schemaType == SchemaType.Swagger2 && IsRequired == false)
             {
                 return true;
             }
 
-            var result = base.IsNullable(schemaType);
-
-            return result;
+            return base.IsNullable(schemaType);
         }
     }
 }

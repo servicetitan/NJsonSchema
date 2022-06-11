@@ -12,7 +12,7 @@ using System.Linq;
 namespace NJsonSchema.CodeGeneration.Models
 {
     /// <summary>The class template base class.</summary>
-    public abstract class ClassTemplateModelBase : TemplateModelBase
+    public abstract class ClassTemplateModelBase
     {
         private readonly JsonSchema _schema;
         private readonly object _rootObject;
@@ -27,10 +27,17 @@ namespace NJsonSchema.CodeGeneration.Models
             _schema = schema;
             _rootObject = rootObject;
             _resolver = resolver;
+
+            SchemaTitle = _schema?.Title;
         }
 
         /// <summary>Gets the class.</summary>
         public abstract string ClassName { get; }
+        
+        /// <summary>
+        /// Gets the original title of the class (schema title).
+        /// </summary>
+        public string SchemaTitle { get; }
 
         /// <summary>Gets a value indicating whether this class represents a JSON object with fixed amount of properties.</summary>
         public bool IsObject => _schema.ActualTypeSchema.IsObject;

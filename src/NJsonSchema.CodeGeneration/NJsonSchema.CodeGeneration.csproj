@@ -1,28 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Description>JSON Schema reader, generator and validator for .NET</Description>
-    <Version>10.3.4</Version>
-    <PackageTags>json schema validation generator .net</PackageTags>
-    <Copyright>Copyright © Rico Suter, 2020</Copyright>
-    <PackageProjectUrl>http://NJsonSchema.org</PackageProjectUrl>
-    <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>../NJsonSchema.snk</AssemblyOriginatorKeyFile>
-    <Authors>Rico Suter</Authors>
-    <PackageIcon>NuGetIcon.png</PackageIcon>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Company />
+    <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DotLiquid" Version="2.0.361" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Fluid.Core" Version="2.2.14" />
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="System.Text.Encodings.Web" Version="5.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NJsonSchema\NJsonSchema.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Include="NuGetIcon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\NJsonSchema\Infrastructure\EnumExtensions.cs">
+      <Link>EnumExtensions.cs</Link>
+    </Compile>
   </ItemGroup>
 </Project>

@@ -1,17 +1,20 @@
 ﻿//-----------------------------------------------------------------------
-// <copyright file="TemplateModelBase.cs" company="NJsonSchema">
+// <copyright file="CSharpClassStyle.cs" company="NJsonSchema">
 //     Copyright (c) Rico Suter. All rights reserved.
 // </copyright>
 // <license>https://github.com/RicoSuter/NJsonSchema/blob/master/LICENSE.md</license>
 // <author>Rico Suter, mail@rsuter.com</author>
 //-----------------------------------------------------------------------
 
-namespace NJsonSchema.CodeGeneration.Models
+namespace NJsonSchema.CodeGeneration.CSharp
 {
-    /// <summary>The base template model.</summary>
-    public class TemplateModelBase
+    /// <summary>The CSharp JSON library to use.</summary>
+    public enum CSharpJsonLibrary
     {
-        /// <summary>Gets the NJsonSchema toolchain version.</summary>
-        public string ToolchainVersion => JsonSchema.ToolchainVersion;
+        /// <summary>Use Newtonsoft.Json</summary>
+        NewtonsoftJson, 
+
+        /// <summary>Use System.Text.Json</summary>
+        SystemTextJson
     }
 }

@@ -33,6 +33,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
             DictionaryBaseType = "System.Collections.Generic.Dictionary";
 
             ClassStyle = CSharpClassStyle.Poco;
+            JsonLibrary = CSharpJsonLibrary.NewtonsoftJson;
 
             RequiredPropertiesMustBeDefined = true;
             GenerateDataAnnotations = true;
@@ -56,7 +57,7 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Gets or sets the .NET namespace of the generated types (default: MyNamespace).</summary>
         public string Namespace { get; set; }
 
-        /// <summary>Gets or sets a value indicating whether a required property must be defined in JSON 
+        /// <summary>Gets or sets a value indicating whether a required property must be defined in JSON
         /// (sets Required.Always when the property is required) (default: true).</summary>
         public bool RequiredPropertiesMustBeDefined { get; set; }
 
@@ -99,6 +100,9 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Gets or sets the CSharp class style (default: 'Poco').</summary>
         public CSharpClassStyle ClassStyle { get; set; }
 
+        /// <summary>Gets or sets the CSharp JSON library to use (default: 'NewtonsoftJson', 'SystemTextJson' is experimental/not complete).</summary>
+        public CSharpJsonLibrary JsonLibrary { get; set; }
+
         /// <summary>Gets or sets the access modifier of generated classes and interfaces (default: 'public').</summary>
         public string TypeAccessModifier { get; set; }
 
@@ -117,10 +121,10 @@ namespace NJsonSchema.CodeGeneration.CSharp
         /// <summary>Gets or sets a value indicating whether to use preserve references handling (All) in the JSON serializer (default: false).</summary>
         public bool HandleReferences { get; set; }
 
-        /// <summary>Gets or sets the name of a static method which is called to transform the JsonSerializerSettings used in the generated ToJson()/FromJson() methods (default: null).</summary>
+        /// <summary>Gets or sets the name of a static method which is called to transform the JsonSerializerSettings (for Newtonsoft.Json) or the JsonSerializerOptions (for System.Text.Json) used in the generated ToJson()/FromJson() methods (default: null).</summary>
         public string JsonSerializerSettingsTransformationMethod { get; set; }
 
-        /// <summary>Gets or sets a value indicating whether to render ToJson() and FromJson() methods (default: true).</summary>
+        /// <summary>Gets or sets a value indicating whether to render ToJson() and FromJson() methods (default: false).</summary>
         public bool GenerateJsonMethods { get; set; }
 
         /// <summary>Gets or sets a value indicating whether enums should be always generated as bit flags (default: false).</summary>
@@ -140,5 +144,8 @@ namespace NJsonSchema.CodeGeneration.CSharp
 
         /// <summary>Gets or sets a value indicating whether to generate Nullable Reference Type annotations (default: false).</summary>
         public bool GenerateNullableReferenceTypes { get; set; }
+
+        /// <summary>Generate C# 9.0 record types instead of record-like classes.</summary>
+        public bool GenerateNativeRecords { get; set; }
     }
 }
