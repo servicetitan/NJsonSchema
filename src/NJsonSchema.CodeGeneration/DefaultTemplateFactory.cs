@@ -118,7 +118,8 @@ namespace NJsonSchema.CodeGeneration
         private sealed class LiquidTemplate : ITemplate
         {
             internal const string TemplateTagName = "template";
-            private static readonly ConcurrentDictionary<(string, string), IFluidTemplate> Templates = new ConcurrentDictionary<(string, string), IFluidTemplate>();
+            // PATCH: use TemplateDirectory as a 3rd key to allow different templates for different folders
+            private static readonly ConcurrentDictionary<(string, string, string), IFluidTemplate> Templates = new ConcurrentDictionary<(string, string, string), IFluidTemplate>();
 
             static LiquidTemplate()
             {
@@ -174,8 +175,9 @@ namespace NJsonSchema.CodeGeneration
 
                 try
                 {
-                    // use language and template name as key for faster lookup than using the content
-                    var key = (_language, _template);
+                    // PATCH: use TemplateDirectory as a 3rd key to allow different templates for different folders
+                    // use language, template name and TemplateDirectory as key for faster lookup than using the content
+                    var key = (_language, _template, _settings.TemplateDirectory);
                     var template = Templates.GetOrAdd(key, _ =>
                     {
                         // our matching expects unix new lines
