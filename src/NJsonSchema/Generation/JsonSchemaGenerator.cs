@@ -478,7 +478,7 @@ namespace NJsonSchema.Generation
             {
                 try
                 {
-                    var docs = type.GetXmlDocsTag("example", Settings.ResolveExternalXmlDocumentation);
+                    var docs = type.GetXmlDocsTag("example", Settings.GetXmlDocsOptions());
                     return GenerateExample(docs);
                 }
                 catch
@@ -498,7 +498,7 @@ namespace NJsonSchema.Generation
             {
                 try
                 {
-                    var docs = accessorInfo.GetXmlDocsTag("example", Settings.ResolveExternalXmlDocumentation);
+                    var docs = accessorInfo.GetXmlDocsTag("example", Settings.GetXmlDocsOptions());
                     return GenerateExample(docs);
                 }
                 catch
@@ -798,7 +798,7 @@ namespace NJsonSchema.Generation
 
         private void ApplySchemaProcessors(JsonSchema schema, ContextualType contextualType, JsonSchemaResolver schemaResolver)
         {
-            var context = new SchemaProcessorContext(contextualType.OriginalType, schema, schemaResolver, this, Settings);
+            var context = new SchemaProcessorContext(contextualType, schema, schemaResolver, this, Settings);
             foreach (var processor in Settings.SchemaProcessors)
             {
                 processor.Process(context);
@@ -864,7 +864,7 @@ namespace NJsonSchema.Generation
 
                 if (Settings.UseXmlDocumentation)
                 {
-                    schema.Description = type.GetXmlDocsSummary(Settings.ResolveExternalXmlDocumentation);
+                    schema.Description = type.GetXmlDocsSummary(Settings.GetXmlDocsOptions());
                 }
 
                 GenerateEnum(schema, typeDescription);

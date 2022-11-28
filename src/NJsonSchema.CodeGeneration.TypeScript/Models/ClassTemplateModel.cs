@@ -111,7 +111,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         /// <summary>Gets a value indicating whether the class inherits from dictionary.</summary>
         public bool HasIndexerProperty => _schema.IsDictionary ||
-                                          _schema.InheritedSchema?.IsDictionary == true;
+                                          _schema.InheritedSchema?.IsDictionary == true ||
+                                          _schema.ActualTypeSchema.AllowAdditionalProperties ||
+                                          _schema.ActualTypeSchema.AdditionalPropertiesSchema != null;
 
         /// <summary>Gets the type of the indexer property value.</summary>
         public string IndexerPropertyValueType
@@ -148,6 +150,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript.Models
 
         /// <summary>Gets a value indicating whether the export keyword should be added to all classes.</summary>
         public bool ExportTypes => _settings.ExportTypes;
+
+        /// <summary>Gets a value indicating whether to generate type check functions.</summary>
+        public bool GenerateTypeCheckFunctions => _settings.GenerateTypeCheckFunctions;
 
         /// <summary>Gets the inherited schema.</summary>
         private JsonSchema InheritedSchema => _schema.InheritedSchema?.ActualSchema;

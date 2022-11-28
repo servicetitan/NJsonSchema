@@ -43,6 +43,7 @@ namespace NJsonSchema.CodeGeneration.TypeScript
             ExtendedClasses = Array.Empty<string>();
 
             InlineNamedDictionaries = false;
+            GenerateTypeCheckFunctions = false;
         }
 
         /// <summary>Gets or sets the target TypeScript version (default: 2.7).</summary>
@@ -65,6 +66,13 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         /// <summary>Gets or sets the date time type (default: 'Date').</summary>
         public TypeScriptDateTimeType DateTimeType { get; set; }
+
+        /// <summary>
+        /// Whether to use UTC (default) or local time zone when deserializing dates 'yyyy-MM-dd' (default: 'false').
+        /// Only applicable if <see cref="DateTimeType"/> is <see cref="TypeScriptDateTimeType.Date"/>.
+        /// Other DateTimeTypes use local timezone by default.
+        /// </summary>
+        public bool ConvertDateToLocalTimezone { get; set; }
 
         /// <summary>Gets or sets the enum style (default: Enum).</summary>
         public TypeScriptEnumStyle EnumStyle { get; set; }
@@ -107,6 +115,9 @@ namespace NJsonSchema.CodeGeneration.TypeScript
 
         /// <summary>Gets or sets a value indicating whether named/referenced dictionaries should be inlined or generated as class with an indexer.</summary>
         public bool InlineNamedDictionaries { get; set; }
+
+        /// <summary>Gets a value indicating whether to generate type check functions (for type style interface only, default: false).</summary>
+        public bool GenerateTypeCheckFunctions { get; set; }
 
         internal ITemplate CreateTemplate(string typeName, object model)
         {
