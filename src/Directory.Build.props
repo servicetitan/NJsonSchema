@@ -8,7 +8,6 @@
       <SignAssembly>True</SignAssembly>
       <AssemblyOriginatorKeyFile>../NJsonSchema.snk</AssemblyOriginatorKeyFile>
 
-      <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
       <PackageTags>json schema validation generator .net</PackageTags>
       <PackageProjectUrl>http://NJsonSchema.org</PackageProjectUrl>
       <Description>JSON Schema reader, generator and validator for .NET</Description>
