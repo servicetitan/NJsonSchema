@@ -8,6 +8,7 @@
 
 using System;
 using System.Linq;
+using System.Web;
 
 namespace NJsonSchema.CodeGeneration.TypeScript
 {
@@ -179,12 +180,14 @@ namespace NJsonSchema.CodeGeneration.TypeScript
                 schema.DiscriminatorObject == null &&
                 schema.ActualTypeSchema.DiscriminatorObject != null)
             {
-                var types = schema.ActualTypeSchema.ActualDiscriminatorObject.Mapping
-                    .Select(m => Resolve(
-                        m.Value,
-                        typeNameHint,
-                        addInterfacePrefix
-                    ));
+                var openApiDiscriminator = schema.ActualTypeSchema.ActualDiscriminatorObject;
+                var types = openApiDiscriminator.Mapping
+                    .Select(m => $"({{ {openApiDiscriminator.PropertyName}: {HttpUtility.JavaScriptStringEncode(m.Key, true)} }} & {Resolve(
+                m.Value,
+                typeNameHint,
+                addInterfacePrefix
+                    )
+            })");
 
                 return string.Join(UnionPipe, types);
             }
